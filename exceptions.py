@@ -140,3 +140,10 @@ class BraveSearchError(Exception):
         super().__init__(message)
         self.message = message
 
+class SerpbaseSearchError(Exception):
+    """Custom exception for SerpBase search errors."""
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+        logger(self.message, level="error")
+
