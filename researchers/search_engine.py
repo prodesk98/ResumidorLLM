@@ -6,6 +6,7 @@ from serpapi import GoogleSearch as SerpapiGoogleSearch
 from parsers import CrawlEngine
 from .brave_search import BraveSearch
 from .tavily_search import TavilySearch
+from .serpbase_search import SerpbaseSearch
 
 from config import (
     LANGUAGE,
@@ -15,7 +16,7 @@ from config import (
 from exceptions import (
     SearchEngineError,
     CrawlerParserError,
-    SummarizationError, BraveSearchError
+    SummarizationError, BraveSearchError, SerpbaseSearchError
 )
 from llm import get_reranker, get_summarization
 from llm.reranker import Reranker
@@ -102,6 +103,17 @@ class SearchEngine(BaseSearchService):
                 )
                 for result in results
             ]
+        elif SEARCH_ENGINE == "serpbase":
+            searcher = SerpbaseSearch()
+            results = searcher.search(query, limit)
+            return [
+                SearchResult(
+                    title=result.title,
+                    description=result.description,
+                    link=result.link,
+                )
+                for result in results
+            ]
         else:
             raise SearchEngineError("Google Search Engine not configured.")
 
@@ -167,5 +179,7 @@ class SearchEngine(BaseSearchService):
             raise SearchEngineError(f"Failed to fetch documents from Google: {e.message}")
         except BraveSearchError as e:
             raise SearchEngineError(f"Failed to fetch documents from Brave: {e.message}")
+        except SerpbaseSearchError as e:
+            raise SearchEngineError(f"Failed to fetch documents from SerpBase: {e.message}")
         except Exception as e:
             raise SearchEngineError(f"An unexpected error occurred: {str(e)}")
